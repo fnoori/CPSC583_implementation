@@ -1,6 +1,24 @@
 let filename = 'downtown_calgary_crime_stats.csv';
 let crimeData;
 let communities = [];
+const SAMPLE_DATA = [
+    { "month" : "January", "point" : [5, 20], "r" : 10 },
+    { "month" : "February", "point" : [480, 90], "r" : 1 },
+    { "month" : "March", "point" : [250, 50], "r" : 3 },
+    { "month" : "April", "point" : [100, 33], "r" : 3 },
+    { "month" : "May", "point" : [330, 95], "r" : 4 },
+    { "month" : "June", "point" : [300, 40], "r" : 8 },
+    { "month" : "July", "point" : [410, 35], "r" : 6 },
+    { "month" : "August", "point" : [475, 44], "r" : 4 },
+    { "month" : "September", "point" : [25, 67], "r" : 1 },
+    { "month" : "October", "point" : [85, 21], "r" : 5 },
+    { "month" : "November", "point" : [220, 88], "r" : 10 },
+    { "month" : "December", "point" : [400, 4], "r" : 7 },
+];
+const WIDTH = 1000;
+const HEIGHT = 300;
+const PAD = 10;
+const MARGIN = 50;
 
 window.onload = () => {
   loadData(filename);
@@ -10,61 +28,51 @@ function loadData(filename) {
   d3.csv(filename)
     .then(data => {
 
-      communities = extractCommunities(data);
+      let xScale =
+        d3.scaleLinear()
+          .domain([0, d3.max(SAMPLE_DATA, (d) => { return d.point[0] })])
+          .range([MARGIN, WIDTH-MARGIN]);
 
-      d3.select('body')
-        .selectAll('div')
-        .data(communities)
-        .enter()
-        .append('div')
-        .text((d) => {
-          return d;
-        });
+      let yScale =
+        d3.scaleLinear()
+          .domain([0, d3.max(SAMPLE_DATA, (d) => { return d.point[0] })])
+          .range([MARGIN, WIDTH-MARGIN]);
 
+      let sizeScale =
+        d3.scalePow()
+          .exponent(2)
+          .domain([0, d3.max(SAMPLE_DATA, (d) => { return d.r })])
+          .range([5, 50]);
 
-        let svgContainer = d3.select('body')
+      let svg =
+        d3.select('body')
           .append('svg')
-          .attr('width', 800)
-          .attr('height', 800);
+          .attr('width', WIDTH)
+          .attr('height', HEIGHT);
 
-/*
-      let svgContainer =
-          d3.select('body')
-            .append('svg')
-            .attr('width', 800)
-            .attr('height', 800);
+      svg.selectAll('circle')
+         .data(SAMPLE_DATA)
+         .enter()
+         .append('circle')
+         .attr('cx', (d) => { return xScale(d.point[0]); })
+         .attr('cy', (d) => { return yScale(d.point[1]); })
+         .attr('r', (d) => { return sizeScale(d.r); })
+         .style('fill', 'coral')
+         .style('stroke', 'none');
 
-      let circleSelection = svgContainer.append('circle')
-            .attr('cx', 25)
-            .attr('cy', 25)
-            .attr('r', 5)
-            .attr('text', 'Abbedale')
-            .style('fill', 'purple');
-*/
-/*
-var svgSelection = bodySelection.append("svg")
- 4                                .attr("width", 50)
- 5                                .attr("height", 50);
- 6
- 7var circleSelection = svgSelection.append("circle")
- 8                                  .attr("cx", 25)
- 9                                  .attr("cy", 25)
-10                                  .attr("r", 25)
-11                                  .style("fill", "purple");
+      svg.selectAll('text')
+         .data(SAMPLE_DATA)
+         .enter()
+         .append('text')
+         .text((d) => { return d.month })
+         .attr('x', (d) => { return xScale(d.point[0]) + sizeScale(d.r) + 2; })
+         .attr('y', (d) => { return yScale(d.point[1]); })
+         .attr('font-family', 'sans-serif')
+         .attr('font-size', '11px')
+         .attr('fill', 'teal')
+         .style('text-anchor', 'start')
+         .style('alignment-baseline', 'middle');
 
-      let circles =
-          svgContainer.selectAll('circle')
-            .data(data)
-            .enter()
-            .append('circle')
-
-      let circleAttributes =
-          circles.attr('cx', 20)
-                  .attr('cy', 20)
-                  .attr('r', (d) => {
-
-                  })
-*/
 
     }).catch(csvErr => {
       console.log(csvErr);
