@@ -19,64 +19,90 @@ const WIDTH = 1000;
 const HEIGHT = 300;
 const PAD = 10;
 const MARGIN = 50;
+const months = ["January", "February", "March", "April", "May", "June",
+           "July", "August", "September", "October", "November", "December"];
+let chosenMonth;
+let eauClaireData = [];
+let communityJSON = {
+  'City': 'Calgary',
+  'children': []
+};
 
 window.onload = () => {
   loadData(filename);
+
+  let slider = document.getElementById("monthRange");
+  let output = document.getElementById("chosenMonth");
+  output.innerHTML = slider.value; // Display the default slider value
+
+  // Update the current slider value (each time you drag the slider handle)
+  slider.onmouseup = function() {
+    output.innerHTML = months[this.value];
+    chosenMonth = months[this.value];
+
+    monthsSliderInteraction();
+
+  }
 }
 
-function loadData(filename) {
-  d3.csv(filename)
-    .then(data => {
+function monthsSliderInteraction() {
+  let packLayout =
+    d3.pack()
+      .size([300,300]);
 
-      let xScale =
-        d3.scaleLinear()
-          .domain([0, d3.max(SAMPLE_DATA, (d) => { return d.point[0] })])
-          .range([MARGIN, WIDTH-MARGIN]);
+  let rootNode = d3.hierarchy(communityJSON);
+  rootNode.sum((d) => {
+    console.log(chosenMonth);
+    let value = d['January'] === undefined ? 0 : d['January'];
+    return value;
+  });
 
-      let yScale =
-        d3.scaleLinear()
-          .domain([0, d3.max(SAMPLE_DATA, (d) => { return d.point[0] })])
-          .range([MARGIN, WIDTH-MARGIN]);
+  packLayout(rootNode);
 
-      let sizeScale =
-        d3.scalePow()
-          .exponent(2)
-          .domain([0, d3.max(SAMPLE_DATA, (d) => { return d.r })])
-          .range([5, 50]);
+  d3.select('svg g')
+    .selectAll('circle')
+    .data(rootNode.descendants())
+    .enter()
+    .append('circle')
+    .attr('cx', (d) => { return d.x })
+    .attr('cy', (d) => { return d.y })
+    .attr('r', (d) => { return d.r });
+}
 
-      let svg =
-        d3.select('body')
-          .append('svg')
-          .attr('width', WIDTH)
-          .attr('height', HEIGHT);
+async function loadData(filename) {
+  data = await d3.csv(filename);
 
-      svg.selectAll('circle')
-         .data(SAMPLE_DATA)
-         .enter()
-         .append('circle')
-         .attr('cx', (d) => { return xScale(d.point[0]); })
-         .attr('cy', (d) => { return yScale(d.point[1]); })
-         .attr('r', (d) => { return sizeScale(d.r); })
-         .style('fill', 'coral')
-         .style('stroke', 'none');
+  data.forEach(row => {
+    if (row.CommunityName === 'EAU CLAIRE') {
+      eauClaireData.push(row);
+    }
+  });
 
-      svg.selectAll('text')
-         .data(SAMPLE_DATA)
-         .enter()
-         .append('text')
-         .text((d) => { return d.month })
-         .attr('x', (d) => { return xScale(d.point[0]) + sizeScale(d.r) + 2; })
-         .attr('y', (d) => { return yScale(d.point[1]); })
-         .attr('font-family', 'sans-serif')
-         .attr('font-size', '11px')
-         .attr('fill', 'teal')
-         .style('text-anchor', 'start')
-         .style('alignment-baseline', 'middle');
-
-
-    }).catch(csvErr => {
-      console.log(csvErr);
+  console.log(eauClaireData);
+  eauClaireData.forEach((row) => {
+    communityJSON.children.push({
+      'CommunityName': row.CommunityName,
+      'children': [
+        {
+          'Category': row.Category,
+          'children': [
+            {'January': row.January},
+            {'February': row.February},
+            {'March': row.March},
+            {'April': row.April},
+            {'May': row.May},
+            {'June': row.June},
+            {'July': row.July},
+            {'August': row.August },
+            {'September': row.September},
+            {'October': row.October},
+            {'November': row.November},
+            {'December': row.December}
+          ]
+        }
+      ]
     });
+  });
 }
 
 function extractCommunities(rawData) {
