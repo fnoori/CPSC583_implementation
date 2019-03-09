@@ -4,55 +4,8 @@
     <meta charset="utf-8">
     <title></title>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/d3/5.9.1/d3.min.js"></script>
+    <script type="text/javascript" src="index.js"></script>
   </head>
   <body>
-
-    <script type="text/javascript">
-      let circleRadii = [40, 20, 10];
-
-      let svgContainer = d3.select('body')
-                        .append('svg')
-                        .attr('width', 200)
-                        .attr('height', 200);
-
-      let circles =
-          svgContainer.selectAll('circle')
-                        .data(circleRadii)
-                        .enter()
-                        .append('circle')
-
-      let circleAttributes =
-          circles.attr('cx', 50)
-                  .attr('cy', 50)
-                  .attr('r', (d) => {
-                    return d;
-                  })
-                  .style('fill', (d) => {
-                    let colour;
-
-                    if (d === 40) {
-                      colour = 'green';
-                    } else if (d === 20) {
-                      colour = 'purple';
-                    } else if (d === 10) {
-                      colour = 'red';
-                    }
-
-                    return colour;
-                  });
-
-
-    </script>
-
-    <style>
-      .chart div {
-        font: 10px sans-serif;
-        background-color: steelblue;
-        text-align: right;
-        padding: 3px;
-        margin: 1px;
-        color: white;
-      }
-    </style>
   </body>
 </html>
