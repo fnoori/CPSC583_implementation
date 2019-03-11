@@ -30,11 +30,10 @@ function sliderChange() {
   monthsSliderInteraction();
 }
 
-
 function monthsSliderInteraction() {
   let packLayout =
     d3.pack()
-      .size([600,600]);
+      .size([500,500]);
 
   let rootNode = d3.hierarchy(communityJSON);
   rootNode.sum((d) => {
@@ -44,52 +43,51 @@ function monthsSliderInteraction() {
 
   packLayout(rootNode);
 
-/*
-  let node = d3.selectAll('circle')
+  let node = d3.selectAll('g circle')
     .data(rootNode.descendants())
     .transition()
     .duration(1000)
     .attr('cx', (d) => { return d.x; })
     .attr('cy', (d) => { return d.y; })
     .attr('r', (d) => { return d.r; });
-*/
-let node = d3.selectAll('g circle')
-  .data(rootNode.descendants())
-  .transition()
-  .duration(1000)
-  .attr('cx', (d) => { return d.x; })
-  .attr('cy', (d) => { return d.y; })
-  .attr('r', (d) => { return d.r; });
 
-let text = d3.selectAll('g text')
-  .data(rootNode.descendants())
-  .text((d) => { return d['data']['Category'] === undefined ? '' : d['data']['Category']; })
-  .attr('x', (d) => { return d.x; })
-  .attr('y', (d) => { return d.y; })
-  .style('fill', 'white')
-  .style('text-anchor', 'middle')
-  .style('font-size', (d) => {
-    let category = d['data']['Category'] === undefined ? '' : d['data']['Category'];
-    let len = category.length;
-    let size = d.r/3;
-    size *= 10 / len;
-    size += 1;
-    return Math.round(size)+'px';
-  });
-
+  let text = d3.selectAll('g text')
+    .data(rootNode.descendants())
+    .transition()
+    .duration(1000)
+    .text((d) => { return d['data']['Category'] === undefined ? '' : d['data']['Category']; })
+    .attr('x', (d) => { return d.x; })
+    .attr('y', (d) => { return d.y; })
+    .style('fill', 'white')
+    .style('text-anchor', 'middle')
+    .style('font-size', (d) => {
+      let category = d['data']['Category'] === undefined ? '' : d['data']['Category'];
+      let len = category.length;
+      let size = d.r/3;
+      size *= 10 / len;
+      size += 1;
+      return Math.round(size)+'px';
+    });
 }
 
 async function loadData(filename) {
   let communityChosen = document.getElementById('communityInput').value;
 
-  data = await d3.csv(filename);
+  if (crimeData === undefined) {
+    crimeData = await d3.csv(filename);
+  }
 
-  data.forEach(row => {
+  communityData = [];
+  crimeData.forEach(row => {
     if (row.CommunityName === communityChosen) {
       communityData.push(row);
     }
   });
 
+  communityJSON = {
+    'City': 'Calgary',
+    'children': []
+  };
   communityData.forEach((row) => {
     communityJSON.children.push({
       'CommunityName': row.CommunityName,
@@ -115,13 +113,15 @@ async function loadData(filename) {
     });
   });
 
+  d3.selectAll("svg > *").remove();
+
   initCircles();
 }
 
 function initCircles() {
   let packLayout =
     d3.pack()
-      .size([600,600]);
+      .size([500,500]);
 
   let rootNode = d3.hierarchy(communityJSON);
   rootNode.sum((d) => {
