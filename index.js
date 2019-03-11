@@ -37,7 +37,7 @@ function monthsSliderInteraction() {
 
   let rootNode = d3.hierarchy(communityJSON);
   rootNode.sum((d) => {
-    let value = d[chosenMonth] === undefined ? 0 : d[chosenMonth];
+    let value = d[chosenMonth] === undefined ? undefined : d[chosenMonth];
     return value;
   });
 
@@ -55,7 +55,7 @@ function monthsSliderInteraction() {
     .data(rootNode.descendants())
     .transition()
     .duration(1000)
-    .text((d) => { return d['data']['Category'] === undefined ? '' : d['data']['Category']; })
+    .text((d) => { return d['data']['Category']; })
     .attr('x', (d) => { return d.x; })
     .attr('y', (d) => { return d.y; })
     .style('fill', 'white')
@@ -89,24 +89,37 @@ async function loadData(filename) {
     'children': []
   };
   communityData.forEach((row) => {
+    let January = row.January === undefined ? 0 : row.January;
+    let February = row.February === undefined ? 0 : row.February;
+    let March = row.March === undefined ? 0 : row.March;
+    let April = row.April === undefined ? 0 : row.April;
+    let May = row.May === undefined ? 0 : row.May;
+    let June = row.June === undefined ? 0 : row.June;
+    let July = row.July === undefined ? 0 : row.July;
+    let August = row.August === undefined ? 0 : row.August;
+    let September = row.September === undefined ? 0 : row.September;
+    let October = row.October === undefined ? 0 : row.October;
+    let November = row.November === undefined ? 0 : row.November;
+    let December = row.December === undefined ? 0 : row.December;
+
     communityJSON.children.push({
       'CommunityName': row.CommunityName,
       'children': [
         {
           'Category': row.Category,
           'children': [
-            {'January': row.January},
-            {'February': row.February},
-            {'March': row.March},
-            {'April': row.April},
-            {'May': row.May},
-            {'June': row.June},
-            {'July': row.July},
-            {'August': row.August },
-            {'September': row.September},
-            {'October': row.October},
-            {'November': row.November},
-            {'December': row.December}
+            {'January': January},
+            {'February': February},
+            {'March': March},
+            {'April': April},
+            {'May': May},
+            {'June': June},
+            {'July': July},
+            {'August': August },
+            {'September': September},
+            {'October': October},
+            {'November': November},
+            {'December': December}
           ]
         }
       ]
@@ -146,7 +159,9 @@ function initCircles() {
     .style('fill', 'red');
 
   g.append('text')
-    .text((d) => { return d['data']['Category'] === undefined ? '' : d['data']['Category']; })
+    .text((d) => {
+      return d['data']['Category'];
+    })
     .attr('x', (d) => { return d.x; })
     .attr('y', (d) => { return d.y; })
     .style('fill', 'white')
