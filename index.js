@@ -22,7 +22,7 @@ const MARGIN = 50;
 const months = ["January", "February", "March", "April", "May", "June",
            "July", "August", "September", "October", "November", "December"];
 let chosenMonth;
-let eauClaireData = [];
+let communityData = [];
 let communityJSON = {
   'City': 'Calgary',
   'children': []
@@ -30,20 +30,20 @@ let communityJSON = {
 
 window.onload = () => {
   loadData(filename);
-
-  let slider = document.getElementById("monthRange");
-  let output = document.getElementById("chosenMonth");
-  output.innerHTML = slider.value; // Display the default slider value
-
-  // Update the current slider value (each time you drag the slider handle)
-  slider.onmouseup = function() {
-    output.innerHTML = months[this.value];
-    chosenMonth = months[this.value];
-
-    monthsSliderInteraction();
-
-  }
+  document.getElementById('monthRange').value = 0;
 }
+
+function sliderChange() {
+  let slider = document.getElementById('monthRange');
+  let output = document.getElementById('chosenMonth');
+
+  output.innerHTML = slider.value; // Display the default slider value
+  output.innerHTML = months[slider.value];
+  chosenMonth = months[slider.value];
+
+  monthsSliderInteraction();
+}
+
 
 function monthsSliderInteraction() {
   let packLayout =
@@ -52,34 +52,47 @@ function monthsSliderInteraction() {
 
   let rootNode = d3.hierarchy(communityJSON);
   rootNode.sum((d) => {
-    console.log(chosenMonth);
-    let value = d['January'] === undefined ? 0 : d['January'];
+    let value = d[chosenMonth] === undefined ? 0 : d[chosenMonth];
     return value;
   });
 
   packLayout(rootNode);
 
-  d3.select('svg g')
-    .selectAll('circle')
+  d3.selectAll('circle')
     .data(rootNode.descendants())
-    .enter()
-    .append('circle')
-    .attr('cx', (d) => { return d.x })
-    .attr('cy', (d) => { return d.y })
-    .attr('r', (d) => { return d.r });
+    .transition()
+    .duration(1000)
+    .attr('cx', (d) => { return d.x; })
+    .attr('cy', (d) => { return d.y; })
+    .attr('r', (d) => { return d.r; });
+
+  /*
+  var selectValue = d3.select('select').property('value')
+  var data2 = data[selectValue]
+  svg.selectAll('circle')
+      .data(data2)
+      .transition()
+      .duration(1000)
+      .attr('cx', function (d) { return d.cx })
+      .attr('cy', function (d) { return d.cy })
+      .attr('r', function (d) { return d.r })
+      .attr('fill', function (d) { return d.fill })
+  */
 }
 
 async function loadData(filename) {
+  let communityChosen = document.getElementById('communityInput').value;
+  console.log(communityChosen);
+
   data = await d3.csv(filename);
 
   data.forEach(row => {
-    if (row.CommunityName === 'EAU CLAIRE') {
-      eauClaireData.push(row);
+    if (row.CommunityName === communityChosen) {
+      communityData.push(row);
     }
   });
 
-  console.log(eauClaireData);
-  eauClaireData.forEach((row) => {
+  communityData.forEach((row) => {
     communityJSON.children.push({
       'CommunityName': row.CommunityName,
       'children': [
@@ -103,6 +116,28 @@ async function loadData(filename) {
       ]
     });
   });
+
+  let packLayout =
+    d3.pack()
+      .size([300,300]);
+
+  let rootNode = d3.hierarchy(communityJSON);
+  rootNode.sum((d) => {
+    console.log(chosenMonth);
+    let value = d['January'] === undefined ? 0 : d['January'];
+    return value;
+  });
+
+  packLayout(rootNode);
+
+  d3.select('svg g')
+    .selectAll('circle')
+    .data(rootNode.descendants())
+    .enter()
+    .append('circle')
+    .attr('cx', (d) => { return d.x })
+    .attr('cy', (d) => { return d.y })
+    .attr('r', (d) => { return d.r });
 }
 
 function extractCommunities(rawData) {

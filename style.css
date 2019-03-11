@@ -6,6 +6,16 @@ input[type=range]::-moz-focus-outer {
   border: 0;
 }
 
+circle {
+  fill: #333;
+  opacity: 0.3;
+  stroke: white;
+}
+
+.data-control {
+  
+}
+
 .slidecontainer {
   width: 40%;
   position: absolute;

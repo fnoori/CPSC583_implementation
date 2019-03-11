@@ -4,6 +4,13 @@
     <meta charset="utf-8">
     <title></title>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/d3/5.9.1/d3.min.js"></script>
+    <script src="https://d3js.org/d3-color.v1.min.js"></script>
+    <script src="https://d3js.org/d3-dispatch.v1.min.js"></script>
+    <script src="https://d3js.org/d3-ease.v1.min.js"></script>
+    <script src="https://d3js.org/d3-interpolate.v1.min.js"></script>
+    <script src="https://d3js.org/d3-selection.v1.min.js"></script>
+    <script src="https://d3js.org/d3-timer.v1.min.js"></script>
+    <script src="https://d3js.org/d3-transition.v1.min.js"></script>
     <script type="text/javascript" src="index.js"></script>
     <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js" integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo" crossorigin="anonymous"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js" integrity="sha384-UO2eT0CpHqdSJQ6hJty5KVphtPhzWj9WO1clHTMGa3JDZwrnQq4sF86dIHNDz0W1" crossorigin="anonymous"></script>
@@ -16,9 +23,14 @@
     <svg width="320" height="320">
       <g></g>
     </svg>
-    <div class="slidecontainer">
-      <p><span id="chosenMonth"></span></p>
-      <input type="range" min="0" max="11" class="slider" id="monthRange">
+    <div class="data-control">
+      <div class="slidecontainer">
+        <p><span id="chosenMonth"></span></p>
+        <input type="range" min="0" max="11" class="slider" oninput="sliderChange()" value="0" id="monthRange">
+      </div>
+      <div class="community-picker">
+        <input type="text" placeholder="Community Name ..." value="EAU CLAIRE" id="communityInput">
+      </div>
     </div>
   </body>
 </html>
