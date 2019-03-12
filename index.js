@@ -61,18 +61,18 @@ function monthsSliderInteraction() {
       }
     })
     .style('font-size', function(d) {
-      var len;
+      let len;
       if (this.getComputedTextLength()) {
         len = this.getComputedTextLength();
       } else {
         len = 30;
       }
 
-       var size = d.r/3;
-       size *= 10 / len;
-       size += 1;
-       console.log(Math.round(size)+'px');
-       return Math.round(size)+'px';
+      let size = d.r/3;
+      size *= 10 / len;
+      size += 1;
+
+      return Math.round(size)+'px';
     })
     .attr('x', (d) => { return d.x; })
     .attr('y', (d) => { return d.y; })
