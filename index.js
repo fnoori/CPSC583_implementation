@@ -55,19 +55,21 @@ function monthsSliderInteraction() {
     .data(rootNode.descendants())
     .transition()
     .duration(1000)
-    .text((d) => { return d['data']['Category']; })
+    .text((d) => {
+      if (d['data'][chosenMonth]) {
+        return d['parent']['data']['Category'];
+      }
+    })
+    .style('font-size', function(d) {
+      setTimeout(() => {
+        console.log(this.getComputedTextLength());
+        return Math.min(2 * d.r, (2 * d.r - 8) / this.getComputedTextLength() * 12) + 'px';
+      }, 4000);
+    })
     .attr('x', (d) => { return d.x; })
     .attr('y', (d) => { return d.y; })
     .style('fill', 'white')
-    .style('text-anchor', 'middle')
-    .style('font-size', (d) => {
-      let category = d['data']['Category'] === undefined ? '' : d['data']['Category'];
-      let len = category.length;
-      let size = d.r/3;
-      size *= 10 / len;
-      size += 1;
-      return Math.round(size)+'px';
-    });
+    .style('text-anchor', 'middle');
 }
 
 async function loadData(filename) {
@@ -160,20 +162,18 @@ function initCircles() {
 
   g.append('text')
     .text((d) => {
-      return d['data']['Category'];
+      if (d['data']['January']) {
+        return d['parent']['data']['Category'];
+      }
+    })
+    .style('font-size', function(d) {
+      console.log(this.getComputedTextLength());
+      return Math.min(2 * d.r, (2 * d.r - 8) / this.getComputedTextLength() * 12) + 'px';
     })
     .attr('x', (d) => { return d.x; })
     .attr('y', (d) => { return d.y; })
     .style('fill', 'white')
-    .style('text-anchor', 'middle')
-    .style('font-size', (d) => {
-      let category = d['data']['Category'] === undefined ? '' : d['data']['Category'];
-      let len = category.length;
-      let size = d.r/3;
-      size *= 10 / len;
-      size += 1;
-      return Math.round(size)+'px';
-    });
+    .style('text-anchor', 'middle');
 
 }
 
