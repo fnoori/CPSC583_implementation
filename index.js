@@ -19,6 +19,24 @@ window.onload = () => {
   document.getElementById('monthRange').value = 0;
 }
 
+var zoom = d3.zoom()
+  .scaleExtent([1, 100])
+  .translateExtent([[-150,-150],[450, 450]])
+  .on('zoom', zoomFn);
+
+  d3.select('svg')
+  .select('g')
+  .style("transform-origin", "50% 50% 0");
+
+function zoomFn() {
+   var t = d3.event.transform;
+  d3.select('svg').select('g')
+    .style('transform', 'translate('+t.x+"px,"+t.y + 'px)scale(' + t.k + ')');
+
+  console.log(t.x,t.y)
+
+}
+
 function sliderChange() {
   let slider = document.getElementById('monthRange');
   let output = document.getElementById('chosenMonth');
@@ -61,18 +79,18 @@ function monthsSliderInteraction() {
       }
     })
     .style('font-size', function(d) {
-      var len;
+      let len;
       if (this.getComputedTextLength()) {
         len = this.getComputedTextLength();
       } else {
         len = 30;
       }
 
-       var size = d.r/3;
-       size *= 10 / len;
-       size += 1;
-       console.log(Math.round(size)+'px');
-       return Math.round(size)+'px';
+      let size = d.r/3;
+      size *= 10 / len;
+      size += 1;
+
+      return Math.round(size)+'px';
     })
     .attr('x', (d) => { return d.x; })
     .attr('y', (d) => { return d.y; })
@@ -143,7 +161,8 @@ async function loadData(filename) {
 
 function initCircles() {
   let packLayout =
-    d3.pack()
+    d3.treemap()
+      .paddingOuter(10)
       .size([500,500]);
 
   let rootNode = d3.hierarchy(communityJSON);
@@ -155,17 +174,18 @@ function initCircles() {
   packLayout(rootNode);
 
   let nodes = d3.select('svg')
-    .selectAll('circle')
+    .selectAll('rect')
     .data(rootNode.descendants());
 
   let g =
     nodes.enter()
     .append('g');
 
-  g.append('circle')
-    .attr('cx', (d) => { return d.x; })
-    .attr('cy', (d) => { return d.y; })
-    .attr('r', (d) => { return d.r })
+  g.append('rect')
+    .attr('x', (d) => { return d.x; })
+    .attr('y', (d) => { return d.y; })
+    .attr('width', function(d) { return d.x1 - d.x0; })
+    .attr('height', function(d) { return d.y1 - d.y0; })
     .style('fill', 'red');
 
   g.append('text')
@@ -173,9 +193,6 @@ function initCircles() {
       if (d['data']['January']) {
         return d['parent']['data']['Category'];
       }
-    })
-    .style('font-size', function(d) {
-      return Math.min(2 * d.r, (2 * d.r - 8) / this.getComputedTextLength() * 12) + 'px';
     })
     .attr('x', (d) => { return d.x; })
     .attr('y', (d) => { return d.y; })
