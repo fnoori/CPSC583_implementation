@@ -46,7 +46,7 @@ function monthsSliderInteraction() {
   let node = d3.selectAll('g circle')
     .data(rootNode.descendants())
     .transition()
-    .duration(1000)
+    .duration(500)
     .attr('cx', (d) => { return d.x; })
     .attr('cy', (d) => { return d.y; })
     .attr('r', (d) => { return d.r; });
@@ -54,17 +54,25 @@ function monthsSliderInteraction() {
   let text = d3.selectAll('g text')
     .data(rootNode.descendants())
     .transition()
-    .duration(1000)
+    .duration(500)
     .text((d) => {
       if (d['data'][chosenMonth]) {
         return d['parent']['data']['Category'];
       }
     })
     .style('font-size', function(d) {
-      setTimeout(() => {
-        console.log(this.getComputedTextLength());
-        return Math.min(2 * d.r, (2 * d.r - 8) / this.getComputedTextLength() * 12) + 'px';
-      }, 4000);
+      var len;
+      if (this.getComputedTextLength()) {
+        len = this.getComputedTextLength();
+      } else {
+        len = 30;
+      }
+
+       var size = d.r/3;
+       size *= 10 / len;
+       size += 1;
+       console.log(Math.round(size)+'px');
+       return Math.round(size)+'px';
     })
     .attr('x', (d) => { return d.x; })
     .attr('y', (d) => { return d.y; })
@@ -167,7 +175,6 @@ function initCircles() {
       }
     })
     .style('font-size', function(d) {
-      console.log(this.getComputedTextLength());
       return Math.min(2 * d.r, (2 * d.r - 8) / this.getComputedTextLength() * 12) + 'px';
     })
     .attr('x', (d) => { return d.x; })
