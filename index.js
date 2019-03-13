@@ -50,7 +50,7 @@ function sliderChange() {
 
 function monthsSliderInteraction() {
   let packLayout =
-    d3.pack()
+    d3.treemap()
       .size([500,500]);
 
   let rootNode = d3.hierarchy(communityJSON);
@@ -61,13 +61,14 @@ function monthsSliderInteraction() {
 
   packLayout(rootNode);
 
-  let node = d3.selectAll('g circle')
+  let node = d3.selectAll('g rect')
     .data(rootNode.descendants())
     .transition()
     .duration(500)
-    .attr('cx', (d) => { return d.x; })
-    .attr('cy', (d) => { return d.y; })
-    .attr('r', (d) => { return d.r; });
+    .attr('x', (d) => { return d.x0; })
+    .attr('y', (d) => { return d.y0; })
+    .attr('width', function(d) { return d.x1 - d.x0; })
+    .attr('height', function(d) { return d.y1 - d.y0; });
 
   let text = d3.selectAll('g text')
     .data(rootNode.descendants())
@@ -79,21 +80,12 @@ function monthsSliderInteraction() {
       }
     })
     .style('font-size', function(d) {
-      let len;
-      if (this.getComputedTextLength()) {
-        len = this.getComputedTextLength();
-      } else {
-        len = 30;
+      if (d.height > 0) {
+        return ((this.getComputedTextLength() / 18)) + 'px';
       }
-
-      let size = d.r/3;
-      size *= 10 / len;
-      size += 1;
-
-      return Math.round(size)+'px';
     })
-    .attr('x', (d) => { return d.x; })
-    .attr('y', (d) => { return d.y; })
+    .attr('dx', (d) => { return d.x1 - d.x0; })
+    .attr('dy', (d) => { return d.y1 - d.y0; })
     .style('fill', 'white')
     .style('text-anchor', 'middle');
 }
@@ -162,7 +154,6 @@ async function loadData(filename) {
 function initCircles() {
   let packLayout =
     d3.treemap()
-      .paddingOuter(10)
       .size([500,500]);
 
   let rootNode = d3.hierarchy(communityJSON);
@@ -182,8 +173,8 @@ function initCircles() {
     .append('g');
 
   g.append('rect')
-    .attr('x', (d) => { return d.x; })
-    .attr('y', (d) => { return d.y; })
+    .attr('x', (d) => { return d.x0; })
+    .attr('y', (d) => { return d.y0; })
     .attr('width', function(d) { return d.x1 - d.x0; })
     .attr('height', function(d) { return d.y1 - d.y0; })
     .style('fill', 'red');
@@ -194,10 +185,15 @@ function initCircles() {
         return d['parent']['data']['Category'];
       }
     })
-    .attr('x', (d) => { return d.x; })
-    .attr('y', (d) => { return d.y; })
+    .attr('dx', (d) => { return d.x1 - d.x0; })
+    .attr('dy', (d) => { return d.y1 - d.y0; })
+    .style('font-size', function(d) {
+      if (d.height > 0) {
+        return ((this.getComputedTextLength() / 18)) + 'px';
+      }
+    })
     .style('fill', 'white')
-    .style('text-anchor', 'middle');
+    .style('text-anchor', 'end');
 
 }
 
