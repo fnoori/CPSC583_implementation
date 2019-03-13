@@ -14,6 +14,7 @@ let communityJSON = {
   'children': []
 };
 
+// onload
 window.onload = () => {
   loadData(filename);
   document.getElementById('monthRange').value = 0;
