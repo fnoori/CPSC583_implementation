@@ -9,7 +9,6 @@ input[type=range]::-moz-focus-outer {
 circle {
   fill: #333;
   opacity: 0.3;
-  stroke: white;
 }
 rect {
   fill: cadetblue;
