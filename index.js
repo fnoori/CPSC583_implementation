@@ -33,24 +33,6 @@ window.onload = () => {
   document.getElementById('monthRange').value = 0;
 }
 
-var zoom = d3.zoom()
-  .scaleExtent([1, 100])
-  .translateExtent([[-150,-150],[450, 450]])
-  .on('zoom', zoomFn);
-
-  d3.select('svg')
-  .select('g')
-  .style("transform-origin", "50% 50% 0");
-
-function zoomFn() {
-   var t = d3.event.transform;
-  d3.select('svg').select('g')
-    .style('transform', 'translate('+t.x+"px,"+t.y + 'px)scale(' + t.k + ')');
-
-  console.log(t.x,t.y)
-
-}
-
 function sliderChange() {
   let slider = document.getElementById('monthRange');
   let output = document.getElementById('chosenMonth');
@@ -63,20 +45,20 @@ function sliderChange() {
 }
 
 function monthsSliderInteraction() {
-  let packLayout =
+  let treemapLayout =
     d3.treemap()
       .size([500,500]);
 
-  let rootNode = d3.hierarchy(communityJSON);
-  rootNode.sum((d) => {
+  let root = d3.hierarchy(communityJSON);
+  root.sum((d) => {
     let value = d[chosenMonth] === undefined ? undefined : d[chosenMonth];
     return value;
   });
 
-  packLayout(rootNode);
+  treemapLayout(root);
 
   let node = d3.selectAll('g rect')
-    .data(rootNode.descendants())
+    .data(root.descendants())
     .transition()
     .duration(500)
     .attr('x', (d) => { return d.x0; })
@@ -91,7 +73,7 @@ function monthsSliderInteraction() {
 
 /*
   let text = d3.selectAll('g text')
-    .data(rootNode.descendants())
+    .data(root.descendants())
     .transition()
     .duration(500)
     .text((d) => {
@@ -173,22 +155,22 @@ async function loadData(filename) {
 }
 
 function initCircles() {
-  let packLayout =
+  let treemapLayout =
     d3.treemap()
       .size([500,500]);
 
-  let rootNode = d3.hierarchy(communityJSON);
-  rootNode.sum((d) => {
+  let root = d3.hierarchy(communityJSON);
+  root.sum((d) => {
     let value = d['January'] === undefined ? 0 : d['January'];
     return value;
   });
 
-  packLayout.paddingInner(1);
-  packLayout(rootNode);
+  treemapLayout.paddingInner(1);
+  treemapLayout(root);
 
   let nodes = d3.select('svg')
     .selectAll('rect')
-    .data(rootNode.descendants());
+    .data(root.descendants());
 
   let g =
     nodes.enter()
