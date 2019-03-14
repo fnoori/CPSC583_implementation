@@ -24,9 +24,6 @@ rect {
 }
 
 .slidecontainer {
-  width: 40%;
-  position: absolute;
-  bottom: 1rem;
 }
 
 /* The slider itself */
