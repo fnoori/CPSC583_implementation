@@ -14,6 +14,20 @@ let communityJSON = {
   'children': []
 };
 
+const crimeColours = {
+  'Assault (Non-domestic)': '#1abc9c',
+  'Commercial Robbery': '#2ecc71',
+  'Street Robbery': '#3498db',
+  'Violence \'Other\' (Non-domestic)': '#9b59b6',
+  'Residential Break & Enter': '#34495e',
+  'Commercial Break & Enter': '#f1c40f',
+  'Theft OF Vehicle': '#e67e22',
+  'Theft FROM Vehicle': '#e74c3c',
+  'Social Disorder': '#ecf0f1',
+  'Physical Disorder': '#95a5a6'
+};
+
+
 window.onload = () => {
   loadData(filename);
   document.getElementById('monthRange').value = 0;
@@ -68,8 +82,14 @@ function monthsSliderInteraction() {
     .attr('x', (d) => { return d.x0; })
     .attr('y', (d) => { return d.y0; })
     .attr('width', function(d) { return d.x1 - d.x0; })
-    .attr('height', function(d) { return d.y1 - d.y0; });
+    .attr('height', function(d) { return d.y1 - d.y0; })
+    .style('fill', (d) => {
+      if ((d['parent'] != null )) {
+        return crimeColours[d['parent']['data']['Category']]
+      }
+    });
 
+/*
   let text = d3.selectAll('g text')
     .data(rootNode.descendants())
     .transition()
@@ -88,6 +108,7 @@ function monthsSliderInteraction() {
     .attr('dy', (d) => { return d.y1 - d.y0; })
     .style('fill', 'white')
     .style('text-anchor', 'middle');
+    */
 }
 
 async function loadData(filename) {
@@ -162,7 +183,6 @@ function initCircles() {
     return value;
   });
 
-  packLayout.tile(d3.treemapSlice);
   packLayout.paddingInner(1);
   packLayout(rootNode);
 
@@ -179,11 +199,17 @@ function initCircles() {
     .attr('y', (d) => { return d.y0; })
     .attr('width', function(d) { return d.x1 - d.x0; })
     .attr('height', function(d) { return d.y1 - d.y0; })
-    .style('fill', 'red');
+    .style('fill', (d) => {
+      if ((d['parent'] != null )) {
+        return crimeColours[d['parent']['data']['Category']]
+      }
+    });
 
+/*
   g.append('text')
     .text((d) => {
       if (d['data']['January']) {
+        console.log(d['parent']['data']['Category']);
         return d['parent']['data']['Category'];
       }
     })
@@ -196,7 +222,7 @@ function initCircles() {
     })
     .style('fill', 'white')
     .style('text-anchor', 'end');
-
+*/
 }
 
 function extractCommunities(rawData) {

@@ -12,8 +12,7 @@ circle {
   stroke: white;
 }
 rect {
-  fill: cadetblue;
-  opacity: 0.3;
+  /*opacity: 0.3;*/
   stroke: rgba(255,255,255,0.5);
 }
 
