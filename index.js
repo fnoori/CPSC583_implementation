@@ -162,6 +162,8 @@ function initCircles() {
     return value;
   });
 
+  packLayout.tile(d3.treemapSlice);
+  packLayout.paddingInner(1);
   packLayout(rootNode);
 
   let nodes = d3.select('svg')
@@ -185,8 +187,8 @@ function initCircles() {
         return d['parent']['data']['Category'];
       }
     })
-    .attr('dx', (d) => { return d.x1 - d.x0; })
-    .attr('dy', (d) => { return d.y1 - d.y0; })
+    .attr('x', (d) => { return d.x1; })
+    .attr('y', (d) => { return d.y1; })
     .style('font-size', function(d) {
       if (d.height > 0) {
         return ((this.getComputedTextLength() / 18)) + 'px';
