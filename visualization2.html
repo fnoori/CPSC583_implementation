@@ -119,8 +119,20 @@
           .style('text-anchor', 'middle');
       }
 
+      function resetSlider() {
+        let slider = document.getElementById('monthRange');
+        let output = document.getElementById('chosenMonth');
+
+        slider.value = 0;
+        output.innerHTML = slider.value;
+        output.innerHTML = months[slider.value];
+        chosenMonth = months[slider.value];
+      }
+
       async function loadData(filename) {
         let communityChosen = document.getElementById('communityInput').value;
+
+        resetSlider();
 
         if (crimeData === undefined) {
           crimeData = await d3.csv(filename);
