@@ -2,6 +2,10 @@
   font-family: 'Mukta Mahee', sans-serif !important;
 }
 
+ul {
+  list-style: none;
+}
+
 input[type=range]::-moz-focus-outer {
   border: 0;
 }
@@ -13,17 +17,18 @@ circle {
 }
 rect {
   stroke: rgba(255,255,255,0.5);
+  fill: white;
+}
+path {
+  fill: #333;
+  opacity: 0.3;
+  stroke: white;
 }
 
-.tmp-text {
-
-}
-
-.data-control {
-
-}
-
-.slidecontainer {
+.square-legend-colour {
+  width: 1rem;
+  height: 1rem;
+  display: inline-block;
 }
 
 /* The slider itself */
