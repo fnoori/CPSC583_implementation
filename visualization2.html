@@ -1,0 +1,238 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <title></title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/d3/5.9.1/d3.min.js"></script>
+    <script src="https://d3js.org/d3-color.v1.min.js"></script>
+    <script src="https://d3js.org/d3-dispatch.v1.min.js"></script>
+    <script src="https://d3js.org/d3-ease.v1.min.js"></script>
+    <script src="https://d3js.org/d3-interpolate.v1.min.js"></script>
+    <script src="https://d3js.org/d3-selection.v1.min.js"></script>
+    <script src="https://d3js.org/d3-timer.v1.min.js"></script>
+    <script src="https://d3js.org/d3-transition.v1.min.js"></script>
+    <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js" integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo" crossorigin="anonymous"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js" integrity="sha384-UO2eT0CpHqdSJQ6hJty5KVphtPhzWj9WO1clHTMGa3JDZwrnQq4sF86dIHNDz0W1" crossorigin="anonymous"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js" integrity="sha384-JjSmVgyd0p3pXB1rRibZUAYoIIy6OrQ6VrjIEaFf/nJGzIxFDsf4x0xIM+B07jRM" crossorigin="anonymous"></script>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css" integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
+    <link href="https://fonts.googleapis.com/css?family=Mukta+Mahee" rel="stylesheet">
+    <link rel="stylesheet" href="style.css">
+  </head>
+  <body class="container mt-4">
+    <div class="row">
+      <svg width="800" height="550" class="col-md-6">
+      </svg>
+      <div class="data-control col-md-6">
+        <div class="community-picker input-group">
+          <input type="text" class="form-control" placeholder="Community Name ..." value="EAU CLAIRE" id="communityInput">
+          <div class="input-group-append">
+            <button type="button" class="btn btn-success" onclick="loadData()">Submit</button>
+          </div>
+        </div>
+        <div class="slidecontainer mt-4 mb-4">
+          <input type="range" min="0" max="11" class="slider" oninput="sliderChange()" value="0" id="monthRange">
+          <div id="chosenMonth"></div>
+        </div>
+      </div>
+    </div>
+    <script type="text/javascript">
+      let filename = 'downtown_calgary_crime_stats.csv';
+      let crimeData;
+      let communities = [];
+      const WIDTH = 1000;
+      const HEIGHT = 300;
+      const PAD = 10;
+      const MARGIN = 50;
+      const months = ["January", "February", "March", "April", "May", "June",
+                 "July", "August", "September", "October", "November", "December"];
+      let chosenMonth;
+      let communityData = [];
+      let communityJSON = {
+        'City': 'Calgary',
+        'children': []
+      };
+
+      // onload
+      window.onload = () => {
+        loadData(filename);
+        document.getElementById('monthRange').value = 0;
+      }
+
+      function sliderChange() {
+        let slider = document.getElementById('monthRange');
+        let output = document.getElementById('chosenMonth');
+
+        output.innerHTML = slider.value; // Display the default slider value
+        output.innerHTML = months[slider.value];
+        chosenMonth = months[slider.value];
+
+        monthsSliderInteraction();
+      }
+
+      function monthsSliderInteraction() {
+        let packLayout =
+          d3.pack()
+            .size([500,500]);
+
+        let rootNode = d3.hierarchy(communityJSON);
+        rootNode.sum((d) => {
+          let value = d[chosenMonth] === undefined ? undefined : d[chosenMonth];
+          return value;
+        });
+
+        packLayout(rootNode);
+
+        let node = d3.selectAll('g circle')
+          .data(rootNode.descendants())
+          .transition()
+          .duration(500)
+          .attr('cx', (d) => { return d.x; })
+          .attr('cy', (d) => { return d.y; })
+          .attr('r', (d) => { return d.r; });
+
+        let text = d3.selectAll('g text')
+          .data(rootNode.descendants())
+          .transition()
+          .duration(500)
+          .text((d) => {
+            if (d['data'][chosenMonth]) {
+              return d['parent']['data']['Category'];
+            }
+          })
+          .style('font-size', function(d) {
+            let len;
+            if (this.getComputedTextLength()) {
+              len = this.getComputedTextLength();
+            } else {
+              len = 30;
+            }
+
+            let size = d.r/3;
+            size *= 10 / len;
+            size += 1;
+
+            return Math.round(size)+'px';
+          })
+          .attr('x', (d) => { return d.x; })
+          .attr('y', (d) => { return d.y; })
+          .style('fill', 'white')
+          .style('text-anchor', 'middle');
+      }
+
+      async function loadData(filename) {
+        let communityChosen = document.getElementById('communityInput').value;
+
+        if (crimeData === undefined) {
+          crimeData = await d3.csv(filename);
+        }
+
+        communityData = [];
+        crimeData.forEach(row => {
+          if (row.CommunityName === communityChosen) {
+            communityData.push(row);
+          }
+        });
+
+        communityJSON = {
+          'City': 'Calgary',
+          'children': []
+        };
+        communityData.forEach((row) => {
+          let January = row.January === undefined ? 0 : row.January;
+          let February = row.February === undefined ? 0 : row.February;
+          let March = row.March === undefined ? 0 : row.March;
+          let April = row.April === undefined ? 0 : row.April;
+          let May = row.May === undefined ? 0 : row.May;
+          let June = row.June === undefined ? 0 : row.June;
+          let July = row.July === undefined ? 0 : row.July;
+          let August = row.August === undefined ? 0 : row.August;
+          let September = row.September === undefined ? 0 : row.September;
+          let October = row.October === undefined ? 0 : row.October;
+          let November = row.November === undefined ? 0 : row.November;
+          let December = row.December === undefined ? 0 : row.December;
+
+          communityJSON.children.push({
+            'CommunityName': row.CommunityName,
+            'children': [
+              {
+                'Category': row.Category,
+                'children': [
+                  {'January': January},
+                  {'February': February},
+                  {'March': March},
+                  {'April': April},
+                  {'May': May},
+                  {'June': June},
+                  {'July': July},
+                  {'August': August },
+                  {'September': September},
+                  {'October': October},
+                  {'November': November},
+                  {'December': December}
+                ]
+              }
+            ]
+          });
+        });
+
+        d3.selectAll("svg > *").remove();
+
+        initCircles();
+      }
+
+      function initCircles() {
+        let packLayout =
+          d3.pack()
+            .size([500,500]);
+
+        let rootNode = d3.hierarchy(communityJSON);
+        rootNode.sum((d) => {
+          let value = d['January'] === undefined ? 0 : d['January'];
+          return value;
+        });
+
+        packLayout(rootNode);
+
+        let nodes = d3.select('svg')
+          .selectAll('circle')
+          .data(rootNode.descendants());
+
+        let g =
+          nodes.enter()
+          .append('g');
+
+        g.append('circle')
+          .attr('cx', (d) => { return d.x; })
+          .attr('cy', (d) => { return d.y; })
+          .attr('r', (d) => { return d.r })
+          .style('fill', 'red');
+
+        g.append('text')
+          .text((d) => {
+            if (d['data']['January']) {
+              return d['parent']['data']['Category'];
+            }
+          })
+          .style('font-size', function(d) {
+            return Math.min(2 * d.r, (2 * d.r - 8) / this.getComputedTextLength() * 12) + 'px';
+          })
+          .attr('x', (d) => { return d.x; })
+          .attr('y', (d) => { return d.y; })
+          .style('fill', 'white')
+          .style('text-anchor', 'middle');
+
+      }
+
+      function extractCommunities(rawData) {
+        let communities = [];
+
+        for (var i = 0; i < rawData.length; i+=10) {
+          communities.push(rawData[i].CommunityName);
+        }
+
+        return communities;
+      }
+
+    </script>
+  </body>
+</html>
