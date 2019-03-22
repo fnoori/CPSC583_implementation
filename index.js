@@ -70,27 +70,6 @@ function monthsSliderInteraction() {
         return crimeColours[d['parent']['data']['Category']]
       }
     });
-
-/*
-  let text = d3.selectAll('g text')
-    .data(root.descendants())
-    .transition()
-    .duration(500)
-    .text((d) => {
-      if (d['data'][chosenMonth]) {
-        return d['parent']['data']['Category'];
-      }
-    })
-    .style('font-size', function(d) {
-      if (d.height > 0) {
-        return ((this.getComputedTextLength() / 18)) + 'px';
-      }
-    })
-    .attr('dx', (d) => { return d.x1 - d.x0; })
-    .attr('dy', (d) => { return d.y1 - d.y0; })
-    .style('fill', 'white')
-    .style('text-anchor', 'middle');
-    */
 }
 
 async function loadData(filename) {
@@ -186,25 +165,6 @@ function initCircles() {
         return crimeColours[d['parent']['data']['Category']]
       }
     });
-
-/*
-  g.append('text')
-    .text((d) => {
-      if (d['data']['January']) {
-        console.log(d['parent']['data']['Category']);
-        return d['parent']['data']['Category'];
-      }
-    })
-    .attr('x', (d) => { return d.x1; })
-    .attr('y', (d) => { return d.y1; })
-    .style('font-size', function(d) {
-      if (d.height > 0) {
-        return ((this.getComputedTextLength() / 18)) + 'px';
-      }
-    })
-    .style('fill', 'white')
-    .style('text-anchor', 'end');
-*/
 }
 
 function extractCommunities(rawData) {
