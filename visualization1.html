@@ -4,6 +4,7 @@
     <meta charset="utf-8">
     <title></title>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/d3/5.9.1/d3.min.js"></script>
+    <script src="https://d3js.org/topojson.v2.min.js"></script>
     <script src="https://d3js.org/d3-color.v1.min.js"></script>
     <script src="https://d3js.org/d3-dispatch.v1.min.js"></script>
     <script src="https://d3js.org/d3-ease.v1.min.js"></script>
@@ -20,69 +21,82 @@
   </head>
   <body class="container mt-4">
     <div class="row">
-      <svg width="800" height="550" class="col-md-6">
+      <h4 id="communityChosen" class="communityHover">EAU CLAIRE</h4>
+    </div>
+    <div class="row">
+      <svg id="treeMapLayout" width="800" height="550" class="col-md-6">
       </svg>
       <div class="data-control col-md-6">
-        <div class="community-picker input-group">
+
+        <div class="community-picker input-group" style="display: none;">
           <input type="text" class="form-control" placeholder="Community Name ..." value="EAU CLAIRE" id="communityInput">
           <div class="input-group-append">
             <button type="button" class="btn btn-success" onclick="loadData()">Submit</button>
           </div>
         </div>
+
+        <div class="legend">
+          <svg id="calgaryMap" width="500" height="500"></svg>
+        </div>
+      </div>
+    </div>
+
+    <div class="row">
+      <div class="col-md-6">
+        <div class="card">
+          <div class="card-header">Legend</div>
+          <div class="card-body">
+            <div class="">
+              <ul>
+                <li>
+                  <div class="square-legend-colour" style="background-color: #1abc9c;"></div>
+                  Assault (Non-domestic)
+                </li>
+                <li>
+                  <div class="square-legend-colour" style="background-color: #2ecc71;"></div>
+                  Commercial Robbery
+                </li>
+                <li>
+                  <div class="square-legend-colour" style="background-color: #3498db;"></div>
+                  Street Robbery
+                </li>
+                <li>
+                  <div class="square-legend-colour" style="background-color: #9b59b6;"></div>
+                  Violence Other (Non-domestic)
+                </li>
+                <li>
+                  <div class="square-legend-colour" style="background-color: #34495e;"></div>
+                  Residential Break & Enter
+                </li>
+                <li>
+                  <div class="square-legend-colour" style="background-color: #f1c40f;"></div>
+                  Commercial Break & Enter
+                </li>
+                <li>
+                  <div class="square-legend-colour" style="background-color: #e67e22;"></div>
+                  Theft OF Vehicle
+                </li>
+                <li>
+                  <div class="square-legend-colour" style="background-color: #e74c3c;"></div>
+                  Theft FROM Vehicle
+                </li>
+                <li>
+                  <div class="square-legend-colour" style="background-color: #ecf0f1;"></div>
+                  Social Disorder
+                </li>
+                <li>
+                  <div class="square-legend-colour" style="background-color: #95a5a6;"></div>
+                  Physical Disorder
+                </li>
+              </ul>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="col-md-6">
         <div class="slidecontainer mt-4 mb-4">
           <input type="range" min="0" max="11" class="slider" oninput="sliderChange()" value="0" id="monthRange">
           <div id="chosenMonth">January</div>
-        </div>
-        <div class="legend">
-          <div class="card">
-            <div class="card-header">Legend</div>
-            <div class="card-body">
-              <div class="">
-                <ul>
-                  <li>
-                    <div class="square-legend-colour" style="background-color: #1abc9c;"></div>
-                    Assault (Non-domestic)
-                  </li>
-                  <li>
-                    <div class="square-legend-colour" style="background-color: #2ecc71;"></div>
-                    Commercial Robbery
-                  </li>
-                  <li>
-                    <div class="square-legend-colour" style="background-color: #3498db;"></div>
-                    Street Robbery
-                  </li>
-                  <li>
-                    <div class="square-legend-colour" style="background-color: #9b59b6;"></div>
-                    Violence Other (Non-domestic)
-                  </li>
-                  <li>
-                    <div class="square-legend-colour" style="background-color: #34495e;"></div>
-                    Residential Break & Enter
-                  </li>
-                  <li>
-                    <div class="square-legend-colour" style="background-color: #f1c40f;"></div>
-                    Commercial Break & Enter
-                  </li>
-                  <li>
-                    <div class="square-legend-colour" style="background-color: #e67e22;"></div>
-                    Theft OF Vehicle
-                  </li>
-                  <li>
-                    <div class="square-legend-colour" style="background-color: #e74c3c;"></div>
-                    Theft FROM Vehicle
-                  </li>
-                  <li>
-                    <div class="square-legend-colour" style="background-color: #ecf0f1;"></div>
-                    Social Disorder
-                  </li>
-                  <li>
-                    <div class="square-legend-colour" style="background-color: #95a5a6;"></div>
-                    Physical Disorder
-                  </li>
-                </ul>
-              </div>
-            </div>
-          </div>
         </div>
       </div>
     </div>
@@ -91,10 +105,6 @@
       let filename = 'downtown_calgary_crime_stats.csv';
       let crimeData;
       let communities = [];
-      const WIDTH = 1000;
-      const HEIGHT = 300;
-      const PAD = 10;
-      const MARGIN = 50;
       const months = ["January", "February", "March", "April", "May", "June",
                  "July", "August", "September", "October", "November", "December"];
       let chosenMonth;
@@ -118,9 +128,11 @@
       };
 
 
-      window.onload = () => {
+      window.onload = async () => {
         loadData(filename);
         document.getElementById('monthRange').value = 0;
+        let calgary = await d3.json('calgary_topo.json');
+        drawMap(calgary);
       }
 
       function sliderChange() {
@@ -173,7 +185,8 @@
       }
 
       async function loadData(filename) {
-        let communityChosen = document.getElementById('communityInput').value;
+        let communityChosen = document.getElementById('communityChosen').innerHTML;
+        console.log(communityChosen);
 
         resetSlider();
 
@@ -230,7 +243,7 @@
           });
         });
 
-        d3.selectAll("svg > *").remove();
+        d3.selectAll("#treeMapLayout > *").remove();
 
         initCircles();
       }
@@ -267,25 +280,6 @@
               return crimeColours[d['parent']['data']['Category']]
             }
           });
-
-      /*
-        g.append('text')
-          .text((d) => {
-            if (d['data']['January']) {
-              console.log(d['parent']['data']['Category']);
-              return d['parent']['data']['Category'];
-            }
-          })
-          .attr('x', (d) => { return d.x1; })
-          .attr('y', (d) => { return d.y1; })
-          .style('font-size', function(d) {
-            if (d.height > 0) {
-              return ((this.getComputedTextLength() / 18)) + 'px';
-            }
-          })
-          .style('fill', 'white')
-          .style('text-anchor', 'end');
-      */
       }
 
       function extractCommunities(rawData) {
@@ -296,6 +290,53 @@
         }
 
         return communities;
+      }
+
+      function drawMap(calgary) {
+        const width = 500
+        const height = 500
+        const calgarySvg = d3.select("#calgaryMap")
+        const myProjection = d3.geoMercator()
+        const path = d3.geoPath().projection(myProjection)
+        const graticule = d3.geoGraticule()
+
+        calgarySvg.append("path")
+          .datum(graticule.outline)
+          .attr("class", "foreground")
+          .attr("d", path)
+
+        let communities = topojson.feature(calgary, calgary.objects.collection)
+        let neighbors = topojson.neighbors(calgary.objects.collection.geometries)
+        let communityBoundaries = topojson.mesh(calgary, calgary.objects.collection, function(a, b) {
+            return a !== b
+        })
+
+        myProjection
+            .scale(1)
+            .translate([0, 0])
+
+        let b = path.bounds(communities),
+                s = .95 / Math.max((b[1][0] - b[0][0]) / width, (b[1][1] - b[0][1]) / height),
+                t = [(width - s * (b[1][0] + b[0][0])) / 2, (height - s * (b[1][1] + b[0][1])) / 2]
+
+        myProjection
+            .scale(s)
+            .translate(t)
+        calgarySvg.selectAll('.communities')
+            .data(communities.features)
+            .enter().append('path')
+            .attr('class', 'calgary-path')
+            .attr('d', path)
+            .on('mouseover', (d) => {
+              d3.select('.communityHover').text(d['properties']['name']);
+            })
+            .on('click', (d) => {
+              d3.select('.communityHover').style('font-weight', 'bold');
+              this.loadData();
+            })
+            .on('mouseout', (d) => {
+              d3.select('.communityHover').style('font-weight', 'normal');
+            })
       }
 
     </script>

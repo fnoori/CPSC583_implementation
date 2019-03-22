@@ -25,6 +25,21 @@ path {
   stroke: white;
 }
 
+
+.foreground {
+  fill: none;
+  stroke: #333;
+  stroke-width: 1.5px;
+}
+.calgary-path {
+  fill: rgba(0,0,0,0.2);
+  stroke: rgba(0,0,0,0.5);
+  opacity: 1 !important;
+}
+.calgary-path:hover {
+  fill: red;
+}
+
 .square-legend-colour {
   width: 1rem;
   height: 1rem;
