@@ -20,28 +20,22 @@
     <link rel="stylesheet" href="style.css">
   </head>
   <body class="container mt-4">
-    <div class="row">
-      <h4 id="communityChosen" class="communityHover">EAU CLAIRE</h4>
-    </div>
-    <div class="row">
-      <svg id="treeMapLayout" width="800" height="550" class="col-md-6">
-      </svg>
-      <div class="data-control col-md-6">
 
-        <div class="community-picker input-group" style="display: none;">
-          <input type="text" class="form-control" placeholder="Community Name ..." value="EAU CLAIRE" id="communityInput">
-          <div class="input-group-append">
-            <button type="button" class="btn btn-success" onclick="loadData()">Submit</button>
-          </div>
-        </div>
+    <div class="row">
 
-        <div class="legend">
-          <svg id="calgaryMap" width="500" height="500"></svg>
-        </div>
+      <div class="col-md-6">
+        <h4 id="communityChosen" class="communityHover">EAU CLAIRE</h4>
+        <svg id="treeMapLayout" width="800" height="550"></svg>
       </div>
+
+      <div class="data-control col-md-6">
+        <h4 id="communityHighlighted">EAU CLAIRE</h4>
+        <svg id="calgaryMap" width="500" height="500"></svg>
+      </div>
+
     </div>
 
-    <div class="row">
+    <div class="row mt-4 mb-4">
       <div class="col-md-6">
         <div class="card">
           <div class="card-header">Legend</div>
@@ -94,7 +88,7 @@
         </div>
       </div>
       <div class="col-md-6">
-        <div class="slidecontainer mt-4 mb-4">
+        <div class="slidecontainer">
           <input type="range" min="0" max="11" class="slider" oninput="sliderChange()" value="0" id="monthRange">
           <div id="chosenMonth">January</div>
         </div>
@@ -102,7 +96,7 @@
     </div>
 
     <script type="text/javascript">
-      let filename = 'downtown_calgary_crime_stats.csv';
+      let filename = 'crime_by_community_2016_ONLY.csv';
       let crimeData;
       let communities = [];
       const months = ["January", "February", "March", "April", "May", "June",
@@ -186,7 +180,6 @@
 
       async function loadData(filename) {
         let communityChosen = document.getElementById('communityChosen').innerHTML;
-        console.log(communityChosen);
 
         resetSlider();
 
@@ -328,14 +321,12 @@
             .attr('class', 'calgary-path')
             .attr('d', path)
             .on('mouseover', (d) => {
-              d3.select('.communityHover').text(d['properties']['name']);
+              d3.select('#communityHighlighted').text(d['properties']['name'].toUpperCase());
             })
             .on('click', (d) => {
+              d3.select('.communityHover').text(d['properties']['name'].toUpperCase());
               d3.select('.communityHover').style('font-weight', 'bold');
               this.loadData();
-            })
-            .on('mouseout', (d) => {
-              d3.select('.communityHover').style('font-weight', 'normal');
             })
       }
 
