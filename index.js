@@ -1,10 +1,6 @@
-let filename = 'downtown_calgary_crime_stats.csv';
+let filename = 'crime_by_community_2016_ONLY.csv';
 let crimeData;
 let communities = [];
-const WIDTH = 1000;
-const HEIGHT = 300;
-const PAD = 10;
-const MARGIN = 50;
 const months = ["January", "February", "March", "April", "May", "June",
            "July", "August", "September", "October", "November", "December"];
 let chosenMonth;
@@ -28,9 +24,12 @@ const crimeColours = {
 };
 
 
-window.onload = () => {
+window.onload = async () => {
+  $('[data-toggle=popover]').popover();
   loadData(filename);
   document.getElementById('monthRange').value = 0;
+  let calgary = await d3.json('calgary_topo.json');
+  drawMap(calgary);
 }
 
 function sliderChange() {
@@ -72,8 +71,20 @@ function monthsSliderInteraction() {
     });
 }
 
+function resetSlider() {
+  let slider = document.getElementById('monthRange');
+  let output = document.getElementById('chosenMonth');
+
+  slider.value = 0;
+  output.innerHTML = slider.value;
+  output.innerHTML = months[slider.value];
+  chosenMonth = months[slider.value];
+}
+
 async function loadData(filename) {
-  let communityChosen = document.getElementById('communityInput').value;
+  let communityChosen = document.getElementById('communityChosen').innerHTML;
+
+  resetSlider();
 
   if (crimeData === undefined) {
     crimeData = await d3.csv(filename);
@@ -128,7 +139,7 @@ async function loadData(filename) {
     });
   });
 
-  d3.selectAll("svg > *").remove();
+  d3.selectAll("#treeMapLayout > *").remove();
 
   initCircles();
 }
@@ -147,6 +158,13 @@ function initCircles() {
   treemapLayout.paddingInner(1);
   treemapLayout(root);
 
+  var tooltip = d3.select("body")
+          .append("div")
+          .attr("class", "my-tooltip")//add the tooltip class
+          .style("position", "absolute")
+          .style("z-index", "10")
+          .style("visibility", "hidden");
+
   let nodes = d3.select('svg')
     .selectAll('rect')
     .data(root.descendants());
@@ -164,6 +182,16 @@ function initCircles() {
       if ((d['parent'] != null )) {
         return crimeColours[d['parent']['data']['Category']]
       }
+    })
+    .on('mouseover', (d) => {
+      tooltip.style("visibility", "visible")
+        .text(d.value)
+    })
+    .on('mousemove', () => {
+      return tooltip.style('top', (d3.event.pageY - 40) + 'px').style('left', (d3.event.pageX - 5) + 'px');
+    })
+    .on('mouseout', () => {
+      return tooltip.style('visibility', 'hidden');
     });
 }
 
@@ -175,4 +203,75 @@ function extractCommunities(rawData) {
   }
 
   return communities;
+}
+
+function drawMap(calgary) {
+  const width = 500;
+  const height = 500;
+  const calgarySvg = d3.select("#calgaryMap");
+  const myProjection = d3.geoMercator();
+  const path = d3.geoPath().projection(myProjection);
+  const graticule = d3.geoGraticule();
+
+  calgarySvg.append("path")
+    .datum(graticule.outline)
+    .attr("class", "foreground")
+    .attr("d", path);
+
+  let communities = topojson.feature(calgary, calgary.objects.collection);
+  let neighbors = topojson.neighbors(calgary.objects.collection.geometries);
+  let communityBoundaries = topojson.mesh(calgary, calgary.objects.collection, function(a, b) {
+      return a !== b;
+  })
+
+  myProjection
+      .scale(1)
+      .translate([0, 0]);
+
+  let b = path.bounds(communities),
+          s = .95 / Math.max((b[1][0] - b[0][0]) / width, (b[1][1] - b[0][1]) / height),
+          t = [(width - s * (b[1][0] + b[0][0])) / 2, (height - s * (b[1][1] + b[0][1])) / 2];
+
+  let communityChosenId = 'EauClaire';
+
+  myProjection
+      .scale(s)
+      .translate(t);
+
+  calgarySvg.selectAll('.communities')
+      .data(communities.features)
+      .enter().append('path')
+      .attr('id', (d) => {
+        return d['properties']['name'].replace(/ /g,'').replace(/\//g,'');
+      })
+      .attr('class', (d) => {
+        return 'calgary-path';
+      })
+      .attr('d', path)
+      .on('mouseover', (d) => {
+        d3.select('#communityHighlighted').text(d['properties']['name'].toUpperCase());
+
+        if (this.communityChosenId != d3.select(d3.event.target).attr('id')) {
+          d3.select(d3.event.target).attr('class', 'calgary-path-mouseover');
+        }
+      })
+      .on('mouseout', (d) => {
+        if (d3.select(d3.event.target).attr('id') != this.communityChosenId) {
+          d3.select(d3.event.target).attr('class', 'calgary-path');
+        }
+
+      })
+      .on('click', (d) => {
+        d3.select('.communityHover').text(d['properties']['name'].toUpperCase());
+        d3.select('.communityHover').style('font-weight', 'bold');
+        d3.select(d3.event.target).attr('class', 'calgary-path-click');
+
+        if (this.communityChosenId != d3.select(d3.event.target).attr('id')) {
+          d3.select(`#${this.communityChosenId}`).attr('class', 'calgary-path');
+        }
+
+        this.communityChosenId = d3.select(d3.event.target).attr('id');
+
+        this.loadData();
+      });
 }
