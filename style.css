@@ -49,6 +49,36 @@ path {
   height: 1rem;
   display: inline-block;
 }
+.Assault-Non-domestic {
+  background-color: #1abc9c;
+}
+.Commercial-Robbery {
+  background-color: #2ecc71;
+}
+.Street-Robbery {
+  background-color: #3498db;
+}
+.Violence-Other-Non-domestic {
+  background-color: #9b59b6;
+}
+.Residential-Break-Enter {
+  background-color: #34495e;
+}
+.Commercial-Break-Enter {
+  background-color: #f1c40f;
+}
+.Theft-OF-Vehicle {
+  background-color: #e67e22;
+}
+.Theft-FROM-Vehicle {
+  background-color: #e74c3c;
+}
+.Social-Disorder {
+  background-color: #ecf0f1;
+}
+.Physical-Disorder {
+  background-color: #95a5a6;
+}
 
 /* The slider itself */
 .slider {

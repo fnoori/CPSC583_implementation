@@ -25,7 +25,53 @@
 
       <div class="col-md-6">
         <h4 id="communityChosen" class="communityHover">EAU CLAIRE</h4>
-        <svg id="treeMapLayout" width="800" height="550"></svg>
+        <button type="button" class="btn btn-secondary" data-html="true" data-container="body" data-toggle="popover" data-placement="top" data-content="
+                      <h5>Legend</h5>
+                      <ul class='pl-0'>
+                        <li>
+                          <div class='square-legend-colour Assault-Non-domestic' style='background-color: #1abc9c;'></div>
+                          Assault (Non-domestic)
+                        </li>
+                        <li>
+                          <div class='square-legend-colour Commercial-Robbery' style='background-color: #2ecc71;'></div>
+                          Commercial Robbery
+                        </li>
+                        <li>
+                          <div class='square-legend-colour Street-Robbery' style='background-color: #3498db;'></div>
+                          Street Robbery
+                        </li>
+                        <li>
+                          <div class='square-legend-colour Violence-Other-Non-domestic' style='background-color: #9b59b6;'></div>
+                          Violence Other (Non-domestic)
+                        </li>
+                        <li>
+                          <div class='square-legend-colour Residential-Break-Enter' style='background-color: #34495e;'></div>
+                          Residential Break & Enter
+                        </li>
+                        <li>
+                          <div class='square-legend-colour Commercial-Break-Enter' style='background-color: #f1c40f;'></div>
+                          Commercial Break & Enter
+                        </li>
+                        <li>
+                          <div class='square-legend-colour Theft-OF-Vehicle' style='background-color: #e67e22;'></div>
+                          Theft OF Vehicle
+                        </li>
+                        <li>
+                          <div class='square-legend-colour Theft-FROM-Vehicle' style='background-color: #e74c3c;'></div>
+                          Theft FROM Vehicle
+                        </li>
+                        <li>
+                          <div class='square-legend-colour Social-Disorder' style='background-color: #ecf0f1;'></div>
+                          Social Disorder
+                        </li>
+                        <li>
+                          <div class='square-legend-colour Physical-Disorder' style='background-color: #95a5a6;'></div>
+                          Physical Disorder
+                        </li>
+                      </ul>">
+          Legend
+        </button>
+        <svg id="treeMapLayout" width="500" height="500"></svg>
       </div>
 
       <div class="data-control col-md-6">
@@ -35,57 +81,8 @@
 
     </div>
 
-    <div class="row mt-4 mb-4">
+    <div class="row mt-5 mb-4">
       <div class="col-md-6">
-        <div class="card">
-          <div class="card-header">Legend</div>
-          <div class="card-body">
-            <div class="">
-              <ul>
-                <li>
-                  <div class="square-legend-colour" style="background-color: #1abc9c;"></div>
-                  Assault (Non-domestic)
-                </li>
-                <li>
-                  <div class="square-legend-colour" style="background-color: #2ecc71;"></div>
-                  Commercial Robbery
-                </li>
-                <li>
-                  <div class="square-legend-colour" style="background-color: #3498db;"></div>
-                  Street Robbery
-                </li>
-                <li>
-                  <div class="square-legend-colour" style="background-color: #9b59b6;"></div>
-                  Violence Other (Non-domestic)
-                </li>
-                <li>
-                  <div class="square-legend-colour" style="background-color: #34495e;"></div>
-                  Residential Break & Enter
-                </li>
-                <li>
-                  <div class="square-legend-colour" style="background-color: #f1c40f;"></div>
-                  Commercial Break & Enter
-                </li>
-                <li>
-                  <div class="square-legend-colour" style="background-color: #e67e22;"></div>
-                  Theft OF Vehicle
-                </li>
-                <li>
-                  <div class="square-legend-colour" style="background-color: #e74c3c;"></div>
-                  Theft FROM Vehicle
-                </li>
-                <li>
-                  <div class="square-legend-colour" style="background-color: #ecf0f1;"></div>
-                  Social Disorder
-                </li>
-                <li>
-                  <div class="square-legend-colour" style="background-color: #95a5a6;"></div>
-                  Physical Disorder
-                </li>
-              </ul>
-            </div>
-          </div>
-        </div>
       </div>
       <div class="col-md-6">
         <div class="slidecontainer">
@@ -123,6 +120,7 @@
 
 
       window.onload = async () => {
+        $('[data-toggle=popover]').popover();
         loadData(filename);
         document.getElementById('monthRange').value = 0;
         let calgary = await d3.json('calgary_topo.json');
