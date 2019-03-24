@@ -32,12 +32,16 @@ path {
   stroke-width: 1.5px;
 }
 .calgary-path {
-  fill: rgba(0,0,0,0.2);
-  stroke: rgba(0,0,0,0.5);
-  opacity: 1 !important;
+  fill: rgba(129,199,132,1);
+  opacity: 1;
 }
-.calgary-path:hover {
-  fill: red;
+.calgary-path-mouseover {
+  fill: rgba(76,175,80,1);
+  opacity: 1;
+}
+.calgary-path-click {
+  fill: black;
+  opacity: 1;
 }
 
 .square-legend-colour {
