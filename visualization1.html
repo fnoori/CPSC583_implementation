@@ -25,52 +25,6 @@
 
       <div class="col-md-6">
         <h4 id="communityChosen" class="communityHover">EAU CLAIRE</h4>
-        <button type="button" class="btn btn-secondary" data-html="true" data-container="body" data-toggle="popover" data-placement="top" data-content="
-                      <h5>Legend</h5>
-                      <ul class='pl-0'>
-                        <li>
-                          <div class='square-legend-colour Assault-Non-domestic' style='background-color: #1abc9c;'></div>
-                          Assault (Non-domestic)
-                        </li>
-                        <li>
-                          <div class='square-legend-colour Commercial-Robbery' style='background-color: #2ecc71;'></div>
-                          Commercial Robbery
-                        </li>
-                        <li>
-                          <div class='square-legend-colour Street-Robbery' style='background-color: #3498db;'></div>
-                          Street Robbery
-                        </li>
-                        <li>
-                          <div class='square-legend-colour Violence-Other-Non-domestic' style='background-color: #9b59b6;'></div>
-                          Violence Other (Non-domestic)
-                        </li>
-                        <li>
-                          <div class='square-legend-colour Residential-Break-Enter' style='background-color: #34495e;'></div>
-                          Residential Break & Enter
-                        </li>
-                        <li>
-                          <div class='square-legend-colour Commercial-Break-Enter' style='background-color: #f1c40f;'></div>
-                          Commercial Break & Enter
-                        </li>
-                        <li>
-                          <div class='square-legend-colour Theft-OF-Vehicle' style='background-color: #e67e22;'></div>
-                          Theft OF Vehicle
-                        </li>
-                        <li>
-                          <div class='square-legend-colour Theft-FROM-Vehicle' style='background-color: #e74c3c;'></div>
-                          Theft FROM Vehicle
-                        </li>
-                        <li>
-                          <div class='square-legend-colour Social-Disorder' style='background-color: #ecf0f1;'></div>
-                          Social Disorder
-                        </li>
-                        <li>
-                          <div class='square-legend-colour Physical-Disorder' style='background-color: #95a5a6;'></div>
-                          Physical Disorder
-                        </li>
-                      </ul>">
-          Legend
-        </button>
         <svg id="treeMapLayout" width="500" height="500"></svg>
       </div>
 
@@ -81,13 +35,59 @@
 
     </div>
 
-    <div class="row mt-5 mb-4">
+    <div class="row mt-5 mb-4 ml-0 mr-0">
       <div class="col-md-6">
-      </div>
-      <div class="col-md-6">
-        <div class="slidecontainer">
-          <input type="range" min="0" max="11" class="slider" oninput="sliderChange()" value="0" id="monthRange">
-          <div id="chosenMonth">January</div>
+        <div class="row">
+          <div class="slidecontainer col-md-10">
+            <input type="range" min="0" max="11" class="slider" oninput="sliderChange()" value="0" id="monthRange">
+            <div id="chosenMonth">January</div>
+          </div>
+          <button type="button" class="btn btn-secondary" data-html="true" data-container="body" data-toggle="popover" data-placement="right" data-content="
+                        <h5>Legend</h5>
+                        <ul class='pl-0'>
+                          <li>
+                            <div class='square-legend-colour Assault-Non-domestic' style='background-color: #1abc9c;'></div>
+                            Assault (Non-domestic)
+                          </li>
+                          <li>
+                            <div class='square-legend-colour Commercial-Robbery' style='background-color: #2ecc71;'></div>
+                            Commercial Robbery
+                          </li>
+                          <li>
+                            <div class='square-legend-colour Street-Robbery' style='background-color: #3498db;'></div>
+                            Street Robbery
+                          </li>
+                          <li>
+                            <div class='square-legend-colour Violence-Other-Non-domestic' style='background-color: #9b59b6;'></div>
+                            Violence Other (Non-domestic)
+                          </li>
+                          <li>
+                            <div class='square-legend-colour Residential-Break-Enter' style='background-color: #34495e;'></div>
+                            Residential Break & Enter
+                          </li>
+                          <li>
+                            <div class='square-legend-colour Commercial-Break-Enter' style='background-color: #f1c40f;'></div>
+                            Commercial Break & Enter
+                          </li>
+                          <li>
+                            <div class='square-legend-colour Theft-OF-Vehicle' style='background-color: #e67e22;'></div>
+                            Theft OF Vehicle
+                          </li>
+                          <li>
+                            <div class='square-legend-colour Theft-FROM-Vehicle' style='background-color: #e74c3c;'></div>
+                            Theft FROM Vehicle
+                          </li>
+                          <li>
+                            <div class='square-legend-colour Social-Disorder' style='background-color: #ecf0f1;'></div>
+                            Social Disorder
+                          </li>
+                          <li>
+                            <div class='square-legend-colour Physical-Disorder' style='background-color: #95a5a6;'></div>
+                            Physical Disorder
+                          </li>
+                        </ul>">
+            Legend
+          </button>
         </div>
       </div>
     </div>
@@ -253,6 +253,13 @@
         treemapLayout.paddingInner(1);
         treemapLayout(root);
 
+        var tooltip = d3.select("body")
+                .append("div")
+                .attr("class", "my-tooltip")//add the tooltip class
+                .style("position", "absolute")
+                .style("z-index", "10")
+                .style("visibility", "hidden");
+
         let nodes = d3.select('svg')
           .selectAll('rect')
           .data(root.descendants());
@@ -270,6 +277,17 @@
             if ((d['parent'] != null )) {
               return crimeColours[d['parent']['data']['Category']]
             }
+          })
+          .on('mouseover', (d) => {
+            console.log(d)
+            tooltip.style("visibility", "visible")
+              .text(d.value)
+          })
+          .on('mousemove', () => {
+            return tooltip.style('top', (d3.event.pageY - 40) + 'px').style('left', (d3.event.pageX - 5) + 'px');
+          })
+          .on('mouseout', () => {
+            return tooltip.style('visibility', 'hidden');
           });
       }
 

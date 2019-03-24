@@ -80,6 +80,11 @@ path {
   background-color: #95a5a6;
 }
 
+.my-tooltip {
+  background: rgba(255, 255, 255, 1);
+  padding: 1px 5px 1px 5px;
+}
+
 /* The slider itself */
 .slider {
   -webkit-appearance: none;  /* Override default CSS styles */
