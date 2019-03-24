@@ -312,8 +312,7 @@
                 s = .95 / Math.max((b[1][0] - b[0][0]) / width, (b[1][1] - b[0][1]) / height),
                 t = [(width - s * (b[1][0] + b[0][0])) / 2, (height - s * (b[1][1] + b[0][1])) / 2]
 
-        let communityChosenId = '';
-        let communityClicked = false;
+        let communityChosenId = ''
         myProjection
             .scale(s)
             .translate(t)
@@ -321,30 +320,33 @@
             .data(communities.features)
             .enter().append('path')
             .attr('id', (d) => {
-              return d['properties']['name'].replace(/ /g,'').replace(/\//g,'');
+              return d['properties']['name'].replace(/ /g,'').replace(/\//g,'')
             })
             .attr('class', 'calgary-path')
             .attr('d', path)
             .on('mouseover', (d) => {
-              d3.select('#communityHighlighted').text(d['properties']['name'].toUpperCase());
-              d3.select(d3.event.target).attr('class', 'calgary-path-mouseover');
+              d3.select('#communityHighlighted').text(d['properties']['name'].toUpperCase())
+
+              if (this.communityChosenId != d3.select(d3.event.target).attr('id')) {
+                d3.select(d3.event.target).attr('class', 'calgary-path-mouseover')
+              }
             })
             .on('mouseout', (d) => {
               if (d3.select(d3.event.target).attr('id') != this.communityChosenId) {
-                d3.select(d3.event.target).attr('class', 'calgary-path');
+                d3.select(d3.event.target).attr('class', 'calgary-path')
               }
 
             })
             .on('click', (d) => {
-              d3.select('.communityHover').text(d['properties']['name'].toUpperCase());
-              d3.select('.communityHover').style('font-weight', 'bold');
-              d3.select(d3.event.target).attr('class', 'calgary-path-click');
+              d3.select('.communityHover').text(d['properties']['name'].toUpperCase())
+              d3.select('.communityHover').style('font-weight', 'bold')
+              d3.select(d3.event.target).attr('class', 'calgary-path-click')
 
               if (this.communityChosenId != d3.select(d3.event.target).attr('id')) {
-                d3.select(`#${this.communityChosenId}`).attr('class', 'calgary-path');
+                d3.select(`#${this.communityChosenId}`).attr('class', 'calgary-path')
               }
 
-              this.communityChosenId = d3.select(d3.event.target).attr('id');
+              this.communityChosenId = d3.select(d3.event.target).attr('id')
 
               this.loadData();
             })
